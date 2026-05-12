@@ -114,10 +114,23 @@ export default function Home() {
       ...playbooks.map((item) => `- ${item}`),
     ].join("\n");
 
-    navigator.clipboard.writeText(report).then(() => {
-      setCopied(true);
-      window.setTimeout(() => setCopied(false), 1800);
-    });
+    navigator.clipboard
+      .writeText(report)
+      .catch(() => {
+        const fallback = document.createElement("textarea");
+        fallback.value = report;
+        fallback.setAttribute("readonly", "true");
+        fallback.style.position = "fixed";
+        fallback.style.opacity = "0";
+        document.body.appendChild(fallback);
+        fallback.select();
+        document.execCommand("copy");
+        document.body.removeChild(fallback);
+      })
+      .finally(() => {
+        setCopied(true);
+        window.setTimeout(() => setCopied(false), 1800);
+      });
   };
 
   const updateFinding = <K extends keyof Finding>(index: number, key: K, value: Finding[K]) => {
